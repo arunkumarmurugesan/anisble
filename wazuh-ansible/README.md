@@ -32,11 +32,11 @@ These playbooks install and configure Wazuh agent, manager and Elastic Stack.
     │ ├── playbooks
     │ │ ├── wazuh-agent.yml
     │ │ ├── wazuh-elastic.yml
-    │ │ ├── wazuh-elastic_stack-distributed.yml
-    │ │ ├── wazuh-elastic_stack-single.yml
     │ │ ├── wazuh-kibana.yml
     │ │ ├── wazuh-logstash.yml
     │ │ ├── wazuh-manager.yml
+    │ │ ├── postfix.yml
+   
     │
     │ ├── README.md
     │ ├── VERSION
