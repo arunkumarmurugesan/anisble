@@ -1,0 +1,11 @@
+---
+aws_access_key: xxxx
+aws_secret_key: xxxx
+email_host: email-smtp.us-west-2.amazonaws.com
+email_port: 587
+email_to: 'example@gmail.com'
+email_from: 'example@gmail.com'
+postfix_sasl_passwd_file: /etc/postfix/sasl_passwd
+postfix_default_database_type: hash
+postfix_service_state: started
+postfix_service_enabled: true

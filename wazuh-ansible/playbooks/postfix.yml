@@ -1,0 +1,9 @@
+---
+- hosts: all
+  become: true
+  become_user: root
+  remote_user: devops
+  gather_facts: true
+  roles:
+    - /root/wazuh-ansible/roles/postfix/ansible-postfix
+

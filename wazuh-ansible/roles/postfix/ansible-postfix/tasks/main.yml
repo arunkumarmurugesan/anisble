@@ -1,0 +1,43 @@
+---
+- name: Ensure no sendmail is installed on the server.
+  package:
+    name: sendmail
+    state: absent
+- name: Ensure postfix and dependencies pakages are installed.
+  yum: pkg={{ item }} state=present
+  with_items:
+    - postfix
+    - cyrus-sasl
+    - cyrus-sasl-plain
+    - cyrus-sasl-md5
+    - cyrus-imapd
+- name: configure main.cf file
+  template:
+    src: main.cf.j2
+    dest: /etc/postfix/main.cf
+    owner: root
+    group: root
+    mode: 0644
+  notify: restart postfix
+
+- name: configure sasl_passwd file
+  template:
+    src: sasl_passwd.j2
+    dest: /etc/postfix/sasl_passwd
+    owner: root
+    group: root
+    mode: 0600
+  notify: restart postfix
+
+- name: postmap sasl_passwd
+  command: postmap {{ postfix_default_database_type }}:{{ postfix_sasl_passwd_file }}
+  notify: restart postfix
+
+- name: Ensure postfix is started and enabled at boot.
+  service:
+    name: postfix
+    state: "{{ postfix_service_state }}"
+    enabled: "{{ postfix_service_enabled }}"
+
+- name: Send the test email for verification 
+  shell: echo "Test mail from postfix" | mail -s "Test Postfix" -r {{ email_from }} {{ email_to }}
