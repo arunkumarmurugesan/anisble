@@ -26,9 +26,6 @@ These playbooks install and configure Wazuh agent, manager, AWS Elastic Stack an
     │ │ │ ├── ansible-wazuh-manager
     │ │ │ ├── ansible-wazuh-agent
     │ │
-    │ │ ├── ansible-galaxy
-    │ │ │ ├── meta
-    │
     │ ├── playbooks
     │ │ ├── wazuh-agent.yml
     │ │ ├── wazuh-elastic.yml
