@@ -1,0 +1,49 @@
+- name: Ansible Template Example
+  template:
+    src: elasticsearch-access-policy.json.j2
+    dest: elasticsearch-access-policy.json
+# use the AWS CLI to query for details about this cluster, if it exists
+- name: check for existing Elasticsearch cluster
+  command: aws es describe-elasticsearch-domains --region {{ aws.region }} --domain-names {{ elasticsearch.domain_name }}
+  changed_when: false
+  register: elasticsearch_cluster_query
+
+# handle the output from the CLI
+- name: parse Elasticsearch cluster query
+  set_fact:
+    elasticsearch_cluster: "{{ (elasticsearch_cluster_query.stdout | from_json).DomainStatusList[0] }}"
+  when: (elasticsearch_cluster_query.stdout | from_json).DomainStatusList[0] is defined
+
+# if the cluster doesn't exist (`when` clause), call the CLI to create it -- passing an evaluated template as the configuration
+- name: create Elasticsearch cluster
+  shell: aws es create-elasticsearch-domain --region {{ aws.region }} --domain-name {{elasticsearch.domain_name}} --elasticsearch-version {{elasticsearch.version}} --elasticsearch-cluster-config InstanceType={{elasticsearch.instance_type}},ZoneAwarenessEnabled={{(elasticsearch.instance_count == 1) | ternary('false', 'true')}},InstanceCount={{elasticsearch.instance_count}} --ebs-options EBSEnabled={{elasticsearch.ebs_enabled}},VolumeType={{elasticsearch.ebs_volume_type}},VolumeSize={{elasticsearch.ebs_size_gb}} --encryption-at-rest-options Enabled={{elasticsearch.atrest}},KmsKeyId={{elasticsearch.kmsid}} --access-policies "`cat roles/deploy_aws_es/templates/elasticsearch-access-policy.json`" 
+  when: elasticsearch_cluster is not defined
+  register: elasticsearch_cluster_create
+
+- name: Get AWS ES Endpoint URL
+  command: aws es describe-elasticsearch-domain --domain-name {{ elasticsearch.domain_name }} --query DomainStatus.Endpoint --output text --region {{ aws.region }}
+  register: aws_es_endpoint
+  delegate_to: 127.0.0.1
+  until: aws_es_endpoint.stdout != 'None'
+  delay: 20
+
+
+- name: Check for Wazuh Alerts template
+  uri:
+    url: "https://{{ aws_es_endpoint.stdout }}/_template/wazuh"
+    method: GET
+    status_code: 200, 404
+  register: wazuh_alerts_template_exits
+  tags: init
+
+- name: Installing Wazuh Alerts template
+  uri:
+    url: "https://{{ aws_es_endpoint.stdout }}/_template/wazuh"
+    method: PUT
+    status_code: 200
+    body_format: json
+    body: "{{ lookup('template','wazuh-elastic6-template-alerts.json.j2') }}"
+  when: wazuh_alerts_template_exits.status != 200
+  tags: init
+
+

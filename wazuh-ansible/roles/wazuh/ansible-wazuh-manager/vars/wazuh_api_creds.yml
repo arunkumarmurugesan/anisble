@@ -1,0 +1,3 @@
+---
+wazuh_api_user:
+  - "admin:admin"

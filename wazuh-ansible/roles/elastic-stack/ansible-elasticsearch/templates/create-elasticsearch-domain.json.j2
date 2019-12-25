@@ -1,0 +1,29 @@
+{
+	"DomainName": "{{ elasticsearch.domain_name }}",
+	"ElasticsearchVersion": "{{ elasticsearch.version }}",
+	"ElasticsearchClusterConfig": {
+		"InstanceType": "{{ elasticsearch.instance_type }}",
+		"InstanceCount": "{{ elasticsearch.instance_count }}",
+		"ZoneAwarenessEnabled": "{{ (elasticsearch.instance_count == 1) | ternary('false', 'true') }}",
+		"DedicatedMasterEnabled": "{{ elasticsearch.dedicated_masters_enabled | lower }}"
+	},
+	"EBSOptions": {
+		"EBSEnabled": true,
+		"VolumeType": "gp2",
+		"VolumeSize": "{{ elasticsearch.ebs_size_gb }}"
+	},
+	"AccessPolicies": "{{ lookup('template', 'templates/elasticsearch-access-policy.json.j2') | to_json | regex_replace('\"', '\\\"') }}",
+	"SnapshotOptions": {
+		"AutomatedSnapshotStartHour": 14
+	},
+	"AdvancedOptions": {
+		"rest.action.multi.allow_explicit_index": "true"
+	},
+	"NodeToNodeEncryptionOptions": {
+		"Enabled": "{{ elasticsearch.nodetonodeencryption }}"
+	},
+	"EncryptionAtRestOptions": {
+		"Enabled": "{{ elasticsearch.atrest }}",
+		"KmsKeyId": "{{ elasticsearch.kmsid }}"
+	}
+}

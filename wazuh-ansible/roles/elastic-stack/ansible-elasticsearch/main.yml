@@ -1,0 +1,9 @@
+---
+-
+  become: true
+  become_user: root
+  gather_facts: true
+  hosts: 127.0.0.1
+  connection: local
+  roles:
+    - deploy_aws_es

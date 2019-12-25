@@ -1,0 +1,23 @@
+# group_vars/elasticsearch.yml
+# # ---
+# # specify defaults for our Elasticsearch clusters
+#
+
+
+aws:
+  region: us-west-2
+  account_id: 770301640873
+
+elasticsearch:
+  version: 6.7
+  instance_type: r5.large.elasticsearch
+  instance_count: 2
+  dedicated_masters_enabled: false
+  ebs_size_gb: 30
+  ebs_enabled: true
+  ebs_volume_type: gp2
+  domain_name: ansibled-big-cluster
+  zonecount: 3
+  atrest: true
+  kmsid: arn:aws:kms:us-west-2:770301640873:key/07b55f02-b30d-48c7-bea5-9c0b3f0ef36a
+  nodetonodeencryption: true     

@@ -1,0 +1,9 @@
+---
+- name: restart sshd amazon
+  service: name=sshd state=restarted
+  when: ansible_distribution == "Amazon"
+
+- name: restart sshd ubuntu
+  service: name=ssh state=restarted
+  when: ansible_distribution == "Ubuntu"
+

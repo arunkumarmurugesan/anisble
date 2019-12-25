@@ -1,0 +1,4 @@
+---
+- hosts: 127.0.0.1
+  roles:
+    - {role: /root/wazuh-ansible/roles/elastic-stack/ansible-logstash, elasticsearch_network_host: "ES_URL"}
